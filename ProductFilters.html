@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Product Filter</title>
+</head>
+<body>
+    <label for="category">Choose a category:</label>
+    <select id="category">
+        <option value="all">All</option>
+        <option value="Electronics">Electronics</option>
+        <option value="Books">Books</option>
+        <option value="Fashion">Fashion</option>
+    </select>
+
+    <label for="search">Search by name:</label>
+    <input type="text" id="search" placeholder="Type product name...">
+
+    <label for="minPrice">Min Price:</label>
+    <input type="number" id="minPrice" placeholder="0">
+
+    <label for="maxPrice">Max Price:</label>
+    <input type="number" id="maxPrice" placeholder="1000">
+
+    <button onclick="filterProducts()">Apply Filters</button>
+
+    <ul id="product-list"></ul>
+
+    <script>
+        const products = [
+            { id: 1, name: "Laptop", category: "Electronics", price: 800 },
+            { id: 2, name: "Shoes", category: "Fashion", price: 50 },
+            { id: 3, name: "Smartphone", category: "Electronics", price: 500 },
+            { id: 4, name: "Novel", category: "Books", price: 20 },
+            { id: 5, name: "Headphones", category: "Electronics", price: 100 }
+        ];
+
+        const categorySelect = document.getElementById("category");
+        const searchInput = document.getElementById("search");
+        const minPriceInput = document.getElementById("minPrice");
+        const maxPriceInput = document.getElementById("maxPrice");
+        const productList = document.getElementById("product-list");
+
+        function displayProducts(filteredProducts) {
+            productList.innerHTML = ""; // Clears existing product list before displaying new filtered results.
+            
+            
+            /* Loops through filteredProducts:
+
+Creates an <li> element for each product.
+
+Sets the text to display the product name and price.
+
+Adds (appendChild) the <li> to <ul> (productList).
+
+    */
+            filteredProducts.forEach(product => {
+                const li = document.createElement("li");
+                li.textContent = `${product.name} - $${product.price}`;
+                productList.appendChild(li);
+            });
+        }
+
+
+        /*
+        
+        Retrieves user input values:
+
+selectedCategory: The currently selected category from the dropdown.
+
+searchTerm: Converts the search input to lowercase for case-insensitive search.
+
+minPrice: Converts the input to a number, defaulting to 0 if empty.
+
+maxPrice: Converts the input to a number, defaulting to Infinity (no limit) if empty.*/
+
+
+        function filterProducts() {
+            const selectedCategory = categorySelect.value;
+            const searchTerm = searchInput.value.toLowerCase();
+            const minPrice = parseFloat(minPriceInput.value) || 0;
+            const maxPrice = parseFloat(maxPriceInput.value) || Infinity;
+
+            /*
+            Filters the products array:
+
+matchesCategory: If "all" is selected, return all products. Otherwise, only return those matching the selected category.
+
+matchesSearch: Check if the product name (lowercased) includes the search term.
+
+matchesPrice: Ensure the product's price is between minPrice and maxPrice.
+
+Returns only the products that meet all three conditions.
+            */
+            let filtered = products.filter(product => {
+                const matchesCategory = selectedCategory === "all" || product.category === selectedCategory;
+                const matchesSearch = product.name.toLowerCase().includes(searchTerm);
+                const matchesPrice = product.price >= minPrice && product.price <= maxPrice;
+
+                return matchesCategory && matchesSearch && matchesPrice;
+            });
+
+            displayProducts(filtered);
+        }
+/*
+Adds event listeners to input fields and dropdown:
+
+Whenever the category changes, filterProducts() runs.
+
+Whenever a user types in the search box, filterProducts() runs.
+
+Whenever the price range inputs change, filterProducts() runs.
+
+This allows real-time filtering as users type/select values.
+*/
+        categorySelect.addEventListener("change", filterProducts);
+        searchInput.addEventListener("input", filterProducts);
+        minPriceInput.addEventListener("input", filterProducts);
+        maxPriceInput.addEventListener("input", filterProducts);
+
+        displayProducts(products); // Displays all products when the page loads
+    </script>
+</body>
+</html>
+
+
+/*
+Creates an array of product objects, each containing:
+
+id (unique identifier),
+
+name (product name),
+
+category (product type),
+
+price (product cost in dollars).
+
+
+Gets references to HTML elements:
+
+categorySelect: The dropdown <select> for choosing product categories.
+
+searchInput: The <input> field where users can type a product name.
+
+minPriceInput: The <input> field for setting a minimum price.
+
+maxPriceInput: The <input> field for setting a maximum price.
+
+productList: The <ul> where filtered products will be displayed.
+*/
+
+/*
+
+How It Works (Step-by-Step)
+User selects a category, enters a search term, or sets a price range.
+
+filterProducts() is triggered due to the event listeners.
+
+The products array is filtered based on:
+
+Category (if selected).
+
+Search term (case insensitive match).
+
+Price range (between min and max price).
+
+The displayProducts(filtered) function updates the <ul> with matching products.*/

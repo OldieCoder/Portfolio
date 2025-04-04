@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factorial & Vowel Counter</title>
+    <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --text-color: white;
+            --container-bg: #333;
+            --button-bg: #28a745;
+            --button-hover: #218838;
+            --copy-bg: #007bff;
+            --copy-hover: #0056b3;
+        }
+
+        body.light-mode {
+            --bg-color: #f5f5f5;
+            --text-color: black;
+            --container-bg: white;
+            --button-bg: #007bff;
+            --button-hover: #0056b3;
+            --copy-bg: #28a745;
+            --copy-hover: #218838;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: 0.3s ease-in-out;
+        }
+
+        .container {
+            background: var(--container-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            max-width: 400px;
+            margin: auto;
+            margin-bottom: 20px;
+            transition: 0.3s ease-in-out;
+        }
+
+        input {
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+            width: 80%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        button {
+            background-color: var(--button-bg);
+            color: white;
+            cursor: pointer;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 5px;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--button-hover);
+        }
+
+        .result {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+            min-height: 30px;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .visible {
+            opacity: 1;
+        }
+
+        .history {
+            text-align: left;
+            max-width: 400px;
+            margin: auto;
+            background: var(--container-bg);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .toggle-theme {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--copy-bg);
+            padding: 10px;
+            border-radius: 50%;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body onload="loadTheme()">
+
+    <button class="toggle-theme" onclick="toggleTheme()">🌙</button>
+
+    <div class="container">
+        <h2>Factorial Calculator</h2>
+        <input type="number" id="factorialInput" placeholder="Enter a number" min="0">
+        <p class="result" id="factorialResult"></p>
+        <button onclick="speakResult('factorialResult')">🔊 Speak</button>
+        <h3>History</h3>
+        <div class="history" id="factorialHistory"></div>
+    </div>
+
+    <div class="container">
+        <h2>Vowel Counter</h2>
+        <input type="text" id="vowelInput" placeholder="Enter a text">
+        <p class="result" id="vowelResult"></p>
+        <button onclick="speakResult('vowelResult')">🔊 Speak</button>
+        <h3>History</h3>
+        <div class="history" id="vowelHistory"></div>
+    </div>
+
+    <script>
+        const factorialWithSteps = (n) => {
+            if (n < 0) return "Invalid input";
+            if (n === 0 || n === 1) return "1";
+            let result = 1, steps = [];
+            for (let i = n; i >= 1; i--) {
+                result *= i;
+                steps.push(i);
+            }
+            return `${n}! = ${steps.join(" × ")} = ${result}`;
+        };
+
+        const calculateFactorial = () => {
+            const num = parseInt(document.getElementById("factorialInput").value);
+            const resultElement = document.getElementById("factorialResult");
+            if (isNaN(num) || num < 0) return;
+            resultElement.innerText = factorialWithSteps(num);
+            resultElement.classList.add("visible");
+            updateHistory("factorialHistory", resultElement.innerText);
+        };
+
+        const countVowels = () => {
+            const str = document.getElementById("vowelInput").value;
+            const vowels = "aeiouAEIOU";
+            const count = [...str].filter(c => vowels.includes(c)).length;
+            const resultElement = document.getElementById("vowelResult");
+            resultElement.innerText = `Vowel Count: ${count}`;
+            resultElement.classList.add("visible");
+            updateHistory("vowelHistory", resultElement.innerText);
+        };
+
+        const updateHistory = (id, text) => {
+            const historyDiv = document.getElementById(id);
+            const entry = document.createElement("p");
+            entry.innerText = text;
+            historyDiv.prepend(entry);
+        };
+
+        const speakResult = (id) => {
+            const text = document.getElementById(id).innerText;
+            if (text) {
+                const speech = new SpeechSynthesisUtterance(text);
+                window.speechSynthesis.speak(speech);
+            }
+        };
+
+        document.getElementById("factorialInput").addEventListener("input", calculateFactorial);
+        document.getElementById("vowelInput").addEventListener("input", countVowels);
+
+        const toggleTheme = () => {
+            document.body.classList.toggle("light-mode");
+            localStorage.setItem("theme", document.body.classList.contains("light-mode") ? "light" : "dark");
+        };
+
+        const loadTheme = () => {
+            if (localStorage.getItem("theme") === "light") {
+                document.body.classList.add("light-mode");
+            }
+        };
+    </script>
+</body>
+</html>
